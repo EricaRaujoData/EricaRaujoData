@@ -1,22 +1,57 @@
+#carregar o pacote pandas
 import pandas as pd
 
+#abrir a minha base de dados e atribuir a um dataframe
 df = pd.read_csv('MICRODADOS_ENEM_2023.csv', encoding='latin1')
 
+#descobrindo o nome das minhas variáveis no banco
 print(df.columns)
 
-with open('MICRODADOS_ENEM_2023.csv', 'r', encoding='latin1') as infile:
-    conteudo = infile.read()
-
+#analisando as primeiras 500 linhas do banco
 print(conteudo[:500]) 
 
+#deixando claro que a linha 1 do banco é o meu cabeçalho
 df = pd.read_csv('MICRODADOS_ENEM_2023.csv', sep=';', encoding='latin1', header=0)
 
+#tirando a frequência da métrica TP_ESCOLA, pois os meus grupos de análise dependem dela
 frequencia_tp_escola = df['TP_ESCOLA'].value_counts()
 print(frequencia_tp_escola)
 
+#carregando o pacote scipy.stats para realização do Teste T
 from scipy.stats import ttest_ind
 
+#aqui estou rotulando os alunos de escola pública e privada de acordo com os seus códigos
 rede_publica = df[df['TP_ESCOLA'] == 2]['NU_NOTA_MT'].dropna()
 rede_privada = df[df['TP_ESCOLA'] == 3]['NU_NOTA_MT'].dropna()
 
+#aqui estou aplicando o test T
 t_stat, p_value = ttest_ind(rede_publica, rede_privada)
+
+#aqui estou apresentando os resultados do Teste T
+print(f"Estatística do teste T: {t_stat:.2f}")
+print(f"Valor-p: {p_value:.4f}")
+
+#aqui estou calculando a média dos alunos por tipo de origem (pública ou privada)
+media_rede_publica = rede_publica.mean()
+media_rede_privada = rede_privada.mean()
+
+#aqui estou apresentando as médias
+print(f"Média das notas na rede pública: {media_rede_publica:.2f}")
+print(f"Média das notas na rede privada: {media_rede_privada:.2f}")
+
+#importando o pacote seaborn e matplotlib para construção de um boxplot
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+#criando o boxplot
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df, x='Rede', y='Nota', palette='coolwarm')
+
+#adicionando título e rótulos ao boxplot
+plt.title('Distribuição das Notas - Rede Pública vs Rede Privada')
+plt.xlabel('Tipo de Escola')
+plt.ylabel('Notas')
+
+#apresentando o boxplot
+plt.show()
+
