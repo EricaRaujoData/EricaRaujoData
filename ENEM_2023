@@ -1,0 +1,22 @@
+import pandas as pd
+
+df = pd.read_csv('MICRODADOS_ENEM_2023.csv', encoding='latin1')
+
+print(df.columns)
+
+with open('MICRODADOS_ENEM_2023.csv', 'r', encoding='latin1') as infile:
+    conteudo = infile.read()
+
+print(conteudo[:500]) 
+
+df = pd.read_csv('MICRODADOS_ENEM_2023.csv', sep=';', encoding='latin1', header=0)
+
+frequencia_tp_escola = df['TP_ESCOLA'].value_counts()
+print(frequencia_tp_escola)
+
+from scipy.stats import ttest_ind
+
+rede_publica = df[df['TP_ESCOLA'] == 2]['NU_NOTA_MT'].dropna()
+rede_privada = df[df['TP_ESCOLA'] == 3]['NU_NOTA_MT'].dropna()
+
+t_stat, p_value = ttest_ind(rede_publica, rede_privada)
